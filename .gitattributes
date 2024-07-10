@@ -1,0 +1,2 @@
+ckpts/minimol_v1/state_dict.pth filter=lfs diff=lfs merge=lfs -text
+ckpts/minimol_v1/state_dict.pth filter=lfs diff=lfs merge=lfs -text
