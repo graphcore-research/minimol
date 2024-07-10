@@ -1,7 +1,11 @@
 minimol.egg-info/
 .git
 .venv
+<<<<<<< HEAD
 __pycache__/
 build/
 dist/
 notebooks/admet-data/
+=======
+__pycache__/
+>>>>>>> 3fa3f3f (Initial commit)
