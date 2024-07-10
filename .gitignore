@@ -1,0 +1,4 @@
+minimol.egg-info/
+.git
+.venv
+__pycache__/
