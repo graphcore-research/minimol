@@ -62,16 +62,27 @@ class Minimol:
             _, extras = model_fp32.forward(batch, extra_return_names=["pre_task_heads"])
             fingerprint_graph = extras['pre_task_heads']['graph_feat']
             num_molecules = min(batch_size, fingerprint_graph.shape[0])
-            results += [fingerprint_graph[i] for i in range(num_molecules)]
+            results += [fingerprint_graph[i].detach().numpy() for i in range(num_molecules)]
         
         return results
     
     def to_fp32(self, input_features: list) -> list:
+        failures = 0
         for input_feature in tqdm(input_features, desc="Casting to FP32"):
-            for k, v in input_feature.items():
-                if isinstance(v, torch.Tensor):
-                    if v.dtype == torch.half:
-                        input_feature[k] = v.float()
-                    elif v.dtype == torch.int32:
-                        input_feature[k] = v.long()
+            try:
+                if not isinstance(input_feature, str):
+                    for k, v in input_feature.items():
+                        if isinstance(v, torch.Tensor):
+                            if v.dtype == torch.half:
+                                input_feature[k] = v.float()
+                            elif v.dtype == torch.int32:
+                                input_feature[k] = v.long()
+                else:
+                    failures += 1
+            except Exception as e:
+                print(f"{input_feature = }")
+                raise e
+
+        if failures != 0:
+            print(f"{failures = }")
         return input_features
