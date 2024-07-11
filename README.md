@@ -1,11 +1,11 @@
 # MiniMol
-A small yet very powerful molecular featurizer that generalises well to biological tasks thanks to the effective pre-training on biological and quantum mechnical datasets.
+A parameter-efficient molecular featuriser that generalises well to biological tasks thanks to the effective pre-training on biological and quantum mechnical datasets.
 
 The model has been introduced in the paper [𝙼𝚒𝚗𝚒𝙼𝚘𝚕: A Parameter-Efficient Foundation Model for Molecular Learning](https://arxiv.org/abs/2404.14986), published in the ICML workshop on *Accessible and Efficient Foundation Models for Biological Discovery* in 2024.
 
 ## Usage
 
-MiniMol is absurdly easy to use:
+Embeddings can be generated in four lines of code:
 
 ```
 from minimol import Minimol
@@ -24,27 +24,30 @@ For training a downstream model on the fingerprints see `./notebooks/downstream_
 
 ## Installation
 
-#### Local-dev
-
-Dependencies are listed in `env.yml`. Installation steps:
-
+### Pip
+The easier way to start using MiniMol is to install it the local environment with pip:
 ```
-# Create and activate the environment
+pip install minimol
+```
+
+### Local
+
+Local installation relies on the dependencies listed in `env.yml` and the following steps:
+
+``` 
+git git@github.com:graphcore-research/minimol.git 
 mamba env create -f env.yml
 mamba activate minimol
 ```
-
-#### pip-installable package
-
-Installation is handled in `setup.py`.
+*To install mamba see [the official documentation](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html).*
 
 ## Performance
 
-The model has been evaluated on 22 benchmarks from the ADMET group of Therapeutics Data Commons (TDC). These are the results when comparing to [MolE]() and TOP5 models from the TDC leaderboard (as of June 2024):
+The model has been evaluated on 22 benchmarks from the ADMET group of [Therapeutics Data Commons (TDC)](https://tdcommons.ai). These are the results when comparing to [MolE](https://arxiv.org/abs/2211.02657) and TOP5 models from the TDC leaderboard (as of June 2024):
 
 | TDC Dataset          |          |            | TDC Leaderboard | MolE           |          | MiniMol (GINE)|          |
 |----------------------|----------|------------|-----------------|----------------|----------|---------------|----------|
-| **Name**             | **Size** | **Metric** | **SOTA Result** | **Result**     | **Rank** | **Result**    | **Rank** |
+| **Name**             | **Size** | **Metric** | **SoTA Result** | **Result**     | **Rank** | **Result**    | **Rank** |
 | **Absorption**       |          |            |                 |                |          |               |          |
 | Caco2 Wang           | 906      | MAE        | 0.276 ± 0.005   | 0.310 ± 0.010  | 6        | 0.324 ± 0.012 | 7        |
 | Bioavailability Ma   | 640      | AUROC      | 0.748 ± 0.033   | 0.654 ± 0.028  | 7        | 0.699 ± 0.008 | 6        |
@@ -73,3 +76,7 @@ The model has been evaluated on 22 benchmarks from the ADMET group of Therapeuti
 | Ames                 | 7,255    | AUROC      | 0.871 ± 0.002   | 0.883 ± 0.005  | 1        | 0.856 ± 0.001 | 5        |
 | DILI                 | 475      | AUROC      | 0.925 ± 0.005   | 0.577 ± 0.021  | 7        | 0.944 ± 0.007 | 1        |
 |                      |          |            |                 | **Mean Rank:** | 5.2      |               | 3.4      |
+
+## License
+
+.
