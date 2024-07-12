@@ -20,12 +20,12 @@ model(smiles)
 >> A list of 4 tensors of (512,) shape
 ```
 
-For training a downstream model on the fingerprints see `./notebooks/downstream_adaptation.ipnyb`.
+For training a downstream model on the fingerprints see [`./notebooks/downstream_adaptation.ipnyb`](https://github.com/graphcore-research/minimol/blob/master/notebooks/downstream_adaptation.ipynb).
 
 ## Installation
 
 ### Pip
-The easier way to start using MiniMol is to install it the local environment with pip:
+The easiest way to start using MiniMol is to install it the local environment with pip:
 ```
 pip install minimol
 ```
