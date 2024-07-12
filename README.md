@@ -1,4 +1,4 @@
-![logotype](imgs/minimol_logotype.png)
+![logotype](imgs/minimol_logotype.jpg)
 
 A parameter-efficient molecular featuriser that generalises well to biological tasks thanks to the effective pre-training on biological and quantum mechnical datasets.
 
