@@ -1,3 +1,5 @@
+![imgs/minimol_logotype.png]
+
 # MiniMol
 A parameter-efficient molecular featuriser that generalises well to biological tasks thanks to the effective pre-training on biological and quantum mechnical datasets.
 
