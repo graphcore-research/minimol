@@ -1,6 +1,5 @@
-![imgs/minimol_logotype.png]
+![logotype](imgs/minimol_logotype.png)
 
-# MiniMol
 A parameter-efficient molecular featuriser that generalises well to biological tasks thanks to the effective pre-training on biological and quantum mechnical datasets.
 
 The model has been introduced in the paper [𝙼𝚒𝚗𝚒𝙼𝚘𝚕: A Parameter-Efficient Foundation Model for Molecular Learning](https://arxiv.org/abs/2404.14986), published in the ICML workshop on *Accessible and Efficient Foundation Models for Biological Discovery* in 2024.
