@@ -42,7 +42,7 @@ class Minimol:
             gradient_acc=1,
             global_bs=self.datamodule.batch_size_training,
         )
-        self.predictor.load_state_dict(torch.load(f"{config_path}/state_dict.pth"))
+        self.predictor.load_state_dict(torch.load(f"{config_path}/state_dict.pth"), strict=False)
 
     def load_config(self, config_path, config_name):
         hydra.initialize(config_path=config_path, version_base=None)
