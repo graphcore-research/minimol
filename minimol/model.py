@@ -17,7 +17,7 @@ from torch_geometric.data import Batch
 
 class Minimol: 
     
-    def __init__(self, config_path="../ckpts/minimol_v1", config_name="config"):
+    def __init__(self, config_path="ckpts/minimol_v1", config_name="config"):
         # Load the config
         cfg = self.load_config(config_path, config_name)
         cfg = OmegaConf.to_container(cfg, resolve=True)
