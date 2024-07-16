@@ -19,7 +19,7 @@ model(smiles)
 >> A list of 4 tensors of (512,) shape
 ```
 
-For training a downstream model on the fingerprints see [`./notebooks/downstream_adaptation.ipnyb`](https://github.com/graphcore-research/minimol/blob/master/notebooks/downstream_adaptation.ipynb).
+For training a downstream model on the fingerprints see [`downstream_adaptation.ipnyb`](notebooks/downstream_adaptation.ipynb).
 
 ## Installation
 
@@ -78,4 +78,6 @@ The model has been evaluated on 22 benchmarks from the ADMET group of [Therapeut
 
 ## License
 
-.
+Copyright (c) 2024 Graphcore Ltd. Licensed under the MIT License.
+
+The included code is released under the MIT license (see [details of the license](LICENSE)).
