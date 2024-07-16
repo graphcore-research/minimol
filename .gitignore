@@ -2,3 +2,6 @@ minimol.egg-info/
 .git
 .venv
 __pycache__/
+build/
+dist/
+notebooks/admet-data/
