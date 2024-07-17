@@ -7,6 +7,7 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
+
 class CustomInstallCommand(install):
     def run(self):
         subprocess.check_call([sys.executable, "-m", "pip", "install", "torch>=2.0"])
@@ -15,8 +16,17 @@ class CustomInstallCommand(install):
 
 setup(
     name='minimol',
-    version='0.2.2',
+    version='0.3.1',
     packages=find_packages(),
+    include_package_data=True,
+    package_data={
+        'minimol.ckpts.minimol_v1': [
+            'state_dict.pth',
+            'config.yaml',
+            'base_shape.yaml'
+        ],
+        '': ['graphium_patch.diff'],
+    },
     install_requires=[
         "typer",
         "loguru",
@@ -58,6 +68,6 @@ setup(
     long_description_content_type='text/markdown',
     python_requires='>=3.9',
     cmdclass={
-        'install': CustomInstallCommand,
+        'install': CustomInstallCommand
     },
 )

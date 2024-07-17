@@ -1,6 +1,9 @@
+import os
 import hydra
 import torch
 from omegaconf import OmegaConf
+from typing import Union
+import pkg_resources
 
 from graphium.config._loader import (
     load_accelerator,
@@ -17,14 +20,20 @@ from torch_geometric.data import Batch
 
 class Minimol: 
     
-    def __init__(self, config_path="ckpts/minimol_v1", config_name="config"):
+    def __init__(self):
+        # handle the paths
+        state_dict_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'state_dict.pth')
+        config_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'config.yaml')
+        base_shapes_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'base_shape.yaml')
+
         # Load the config
-        cfg = self.load_config(config_path, config_name)
+        cfg = self.load_config(os.path.basename(config_path))
         cfg = OmegaConf.to_container(cfg, resolve=True)
         # Set the accelerator
         cfg['accelerator']['type'] = 'gpu' if torch.cuda.is_available() else 'cpu'
         self.cfg, accelerator_type = load_accelerator(cfg)
         # Load the datamodule
+        self.cfg['architecture']['mup_base_path'] = base_shapes_path
         self.datamodule = load_datamodule(self.cfg, accelerator_type)
         # Load the model
         model_class, model_kwargs = load_architecture(cfg, in_dims=self.datamodule.in_dims)
@@ -42,14 +51,16 @@ class Minimol:
             gradient_acc=1,
             global_bs=self.datamodule.batch_size_training,
         )
-        self.predictor.load_state_dict(torch.load(f"{config_path}/state_dict.pth"), strict=False)
+        self.predictor.load_state_dict(torch.load(state_dict_path), strict=False)
 
-    def load_config(self, config_path, config_name):
-        hydra.initialize(config_path=config_path, version_base=None)
+    def load_config(self, config_name):
+        hydra.initialize('ckpts/minimol_v1/', version_base=None)
         cfg = hydra.compose(config_name=config_name)
         return cfg
 
-    def __call__(self, smiles: list) -> torch.Tensor:   
+    def __call__(self, smiles: Union[str,list]) -> torch.Tensor:
+        smiles = [smiles] if not isinstance(smiles, list) else smiles
+
         input_features, _ = self.datamodule._featurize_molecules(smiles)
         input_features = self.to_fp32(input_features)
 

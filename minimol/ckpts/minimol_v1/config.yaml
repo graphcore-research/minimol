@@ -15,8 +15,8 @@ datamodule:
     task_specific_args:   # To be replaced by a new class "DatasetParams"
       l1000_vcap:
         df: null
-        df_path: /home/blazejb/graphium/graphium/data/neurips2023/large-dataset/LINCS_L1000_VCAP_0-2_th4.csv
-        splits_path: /home/blazejb/graphium/graphium/data/neurips2023/large-dataset/l1000_vcap_random_splits.pt
+        df_path: graphium/data/neurips2023/large-dataset/LINCS_L1000_VCAP_0-2_th4.csv
+        splits_path: graphium/data/neurips2023/large-dataset/l1000_vcap_random_splits.pt
         # df_path: graphium/data/neurips2023/foat_th4_reset_index/LINCS_L1000_VCAP_0-2_th4.csv
         # splits_path: graphium/data/neurips2023/foat_th4_reset_index/LINCS_L1000_VCAP_0-2_th4_no_admet_test_random_split.pt
         # wget https://storage.googleapis.com/graphium-public/datasets/neurips_2023/Large-dataset/LINCS_L1000_VCAP_0-4.csv.gz
@@ -29,8 +29,8 @@ datamodule:
 
       l1000_mcf7:
         df: null
-        df_path: /home/blazejb/graphium/graphium/data/neurips2023/large-dataset/LINCS_L1000_MCF7_0-2_th4.csv
-        splits_path: /home/blazejb/graphium/graphium/data/neurips2023/large-dataset/l1000_mcf7_random_splits.pt
+        df_path: graphium/data/neurips2023/large-dataset/LINCS_L1000_MCF7_0-2_th4.csv
+        splits_path: graphium/data/neurips2023/large-dataset/l1000_mcf7_random_splits.pt
         # df_path: graphium/data/neurips2023/foat_th4_reset_index/LINCS_L1000_MCF7_0-2_th4.csv
         # splits_path: graphium/data/neurips2023/foat_th4_reset_index/LINCS_L1000_MCF7_0-2_th4_no_admet_test_random_split.pt
         # wget https://storage.googleapis.com/graphium-public/datasets/neurips_2023/Large-dataset/LINCS_L1000_MCF7_0-4.csv.gz
@@ -43,8 +43,8 @@ datamodule:
 
       pcba_1328:
         df: null
-        df_path: /home/blazejb/graphium/graphium/data/neurips2023/large-dataset/PCBA_1328_1564k.parquet
-        splits_path: /home/blazejb/graphium/graphium/data/neurips2023/large-dataset/pcba_1328_random_splits.pt
+        df_path: graphium/data/neurips2023/large-dataset/PCBA_1328_1564k.parquet
+        splits_path: graphium/data/neurips2023/large-dataset/pcba_1328_random_splits.pt
         # df_path: graphium/data/neurips2023/foat_th4_reset_index/PCBA_1328_1564k.parquet
         # splits_path: graphium/data/neurips2023/foat_th4_reset_index/PCBA_1328_1564k_no_admet_test_random_split.pt
         # wget https://storage.googleapis.com/graphium-public/datasets/neurips_2023/Large-dataset/PCBA_1328_1564k.parquet
@@ -57,8 +57,8 @@ datamodule:
 
       pcqm4m_g25:
         df: null
-        df_path: /home/blazejb/graphium/graphium/data/neurips2023/large-dataset/PCQM4M_G25_N4.parquet
-        splits_path: /home/blazejb/graphium/graphium/data/neurips2023/large-dataset/pcqm4m_g25_n4_random_splits.pt
+        df_path: graphium/data/neurips2023/large-dataset/PCQM4M_G25_N4.parquet
+        splits_path: graphium/data/neurips2023/large-dataset/pcqm4m_g25_n4_random_splits.pt
         # df_path: graphium/data/neurips2023/foat_th4_reset_index/PCQM4M_G25_N4.parquet
         # splits_path: graphium/data/neurips2023/foat_th4_reset_index/PCQM4M_G25_N4_no_admet_test_random_split.pt
         # wget https://storage.googleapis.com/graphium-public/datasets/neurips_2023/Large-dataset/PCQM4M_G25_N4.parquet
@@ -74,8 +74,8 @@ datamodule:
 
       pcqm4m_n4:
         df: null
-        df_path: /home/blazejb/graphium/graphium/data/neurips2023/large-dataset/PCQM4M_G25_N4.parquet
-        splits_path: /home/blazejb/graphium/graphium/data/neurips2023/large-dataset/pcqm4m_g25_n4_random_splits.pt
+        df_path: graphium/data/neurips2023/large-dataset/PCQM4M_G25_N4.parquet
+        splits_path: graphium/data/neurips2023/large-dataset/pcqm4m_g25_n4_random_splits.pt
         # df_path: graphium/data/neurips2023/foat_th4_reset_index/PCQM4M_G25_N4.parquet
         # splits_path: graphium/data/neurips2023/foat_th4_reset_index/PCQM4M_G25_N4_no_admet_test_random_split.pt
         # wget https://storage.googleapis.com/graphium-public/datasets/neurips_2023/Large-dataset/PCQM4M_G25_N4.parquet
@@ -253,7 +253,7 @@ trainer:
 
 architecture:
   model_type: FullGraphMultiTaskNetwork
-  mup_base_path: ../ckpts/minimol_v1/base_shape.yaml
+  mup_base_path: ../minimol/ckpts/minimol_v1/base_shape.yaml
   mup_load_or_save: load
   pre_nn:   # Set as null to avoid a pre-nn network
     out_dim: 128
