@@ -24,9 +24,9 @@ For training a downstream model on the fingerprints see [`downstream_adaptation.
 ## Installation
 
 ### Pip
-The easiest way to start using MiniMol is to install it the local environment with pip:
+The easiest way to start using MiniMol is to install it the local environment from this repository with pip:
 ```
-pip install minimol
+pip install git+https://github.com/graphcore-research/minimol
 ```
 
 ### Local
