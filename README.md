@@ -16,7 +16,7 @@ smiles = [
     'c1ccc(-c2cccnc2)cc1',
 ]
 model(smiles)
->> A list of 4 tensors of (512,) shape
+>> A list of 4 tensors of (1024,) shape
 ```
 
 For training a downstream model on the fingerprints see [`downstream_adaptation.ipnyb`](notebooks/downstream_adaptation.ipynb).
