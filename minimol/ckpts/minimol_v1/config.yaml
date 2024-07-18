@@ -332,7 +332,7 @@ architecture:
       last_activation: none
       dropout: *dropout
       normalization: *normalization
-      last_normalization: layer_norm
+      last_normalization: "none"
       residual_type: none
     node:
       pooling: [max]

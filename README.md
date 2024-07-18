@@ -24,17 +24,13 @@ For training a downstream model on the fingerprints see [`downstream_adaptation.
 ## Installation
 
 ### Pip
-The easiest way to start using MiniMol is to install it the local environment from this repository with pip:
 ```
-pip install git+https://github.com/graphcore-research/minimol
+pip install minimol
 ```
 
 ### Local
-
-Local installation relies on the dependencies listed in `env.yml` and the following steps:
-
 ``` 
-git git@github.com:graphcore-research/minimol.git 
+git clone git@github.com:graphcore-research/minimol.git 
 mamba env create -f env.yml
 mamba activate minimol
 ```

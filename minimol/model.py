@@ -5,6 +5,7 @@ from omegaconf import OmegaConf
 from typing import Union
 import pkg_resources
 
+from graphium.finetuning.fingerprinting import Fingerprinter
 from graphium.config._loader import (
     load_accelerator,
     load_predictor,
@@ -24,7 +25,7 @@ class Minimol:
         # handle the paths
         state_dict_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'state_dict.pth')
         config_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'config.yaml')
-        base_shapes_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'base_shape.yaml')
+        base_shape_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'base_shape.yaml')
 
         # Load the config
         cfg = self.load_config(os.path.basename(config_path))
@@ -33,12 +34,12 @@ class Minimol:
         cfg['accelerator']['type'] = 'gpu' if torch.cuda.is_available() else 'cpu'
         self.cfg, accelerator_type = load_accelerator(cfg)
         # Load the datamodule
-        self.cfg['architecture']['mup_base_path'] = base_shapes_path
+        self.cfg['architecture']['mup_base_path'] = base_shape_path
         self.datamodule = load_datamodule(self.cfg, accelerator_type)
         # Load the model
         model_class, model_kwargs = load_architecture(cfg, in_dims=self.datamodule.in_dims)
         metrics = load_metrics(self.cfg)
-        self.predictor = load_predictor(
+        predictor = load_predictor(
             config=self.cfg,
             model_class=model_class,
             model_kwargs=model_kwargs,
@@ -51,7 +52,10 @@ class Minimol:
             gradient_acc=1,
             global_bs=self.datamodule.batch_size_training,
         )
-        self.predictor.load_state_dict(torch.load(state_dict_path), strict=False)
+        predictor.load_state_dict(torch.load(state_dict_path), strict=False)
+        self.predictor = Fingerprinter(predictor, 'graph_output_nn-graph:1', out_type='numpy')
+        self.predictor.setup()
+
 
     def load_config(self, config_name):
         hydra.initialize('ckpts/minimol_v1/', version_base=None)
@@ -63,18 +67,16 @@ class Minimol:
 
         input_features, _ = self.datamodule._featurize_molecules(smiles)
         input_features = self.to_fp32(input_features)
-
+        
         batch_size = min(100, len(input_features))
 
         results = []
         for i in tqdm(range(0, len(input_features), batch_size)):
             batch = Batch.from_data_list(input_features[i:(i + batch_size)])
-            model_fp32 = self.predictor.model.float()
-            _, extras = model_fp32.forward(batch, extra_return_names=["pre_task_heads"])
-            fingerprint_graph = extras['pre_task_heads']['graph_feat']
+            batch = {"features": batch}
+            fingerprint_graph = self.predictor.get_fingerprints_for_batch(batch)
             num_molecules = min(batch_size, fingerprint_graph.shape[0])
-            results += [fingerprint_graph[i].detach().numpy() for i in range(num_molecules)]
-        
+            results += [fingerprint_graph[i] for i in range(num_molecules)]
         return results
     
     def to_fp32(self, input_features: list) -> list:
