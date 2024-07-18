@@ -24,7 +24,6 @@ For training a downstream model on the fingerprints see [`./notebooks/downstream
 ## Installation
 
 ### Pip
-The easiest way to start using MiniMol is to install it the local environment with pip:
 ```
 pip install minimol
 ```
