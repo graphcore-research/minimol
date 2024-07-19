@@ -31,7 +31,8 @@ pip install minimol
 ### Local
 ``` 
 git clone git@github.com:graphcore-research/minimol.git 
-mamba env create -f env.yml
+cd minimol
+mamba env create -f env.yml -n minimol_venv
 mamba activate minimol
 ```
 *To install mamba see [the official documentation](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html).*

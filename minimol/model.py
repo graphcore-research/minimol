@@ -53,7 +53,8 @@ class Minimol:
             global_bs=self.datamodule.batch_size_training,
         )
         predictor.load_state_dict(torch.load(state_dict_path), strict=False)
-        self.predictor = Fingerprinter(predictor, 'graph_output_nn-graph:1', out_type='numpy')
+        predictor = predictor.float()
+        self.predictor = Fingerprinter(predictor, 'graph_output_nn-graph:0', out_type='numpy')
         self.predictor.setup()
 
 
