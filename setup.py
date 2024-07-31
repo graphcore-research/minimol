@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='minimol',
-    version='1.1',
+    version='1.2',
     packages=find_packages(),
     include_package_data=True,
     package_data={
