@@ -5,6 +5,8 @@ from omegaconf import OmegaConf
 from typing import Union
 import pkg_resources
 
+from torch_geometric.nn import global_max_pool
+
 from graphium.finetuning.fingerprinting import Fingerprinter
 from graphium.config._loader import (
     load_accelerator,
@@ -24,7 +26,7 @@ class Minimol:
     def __init__(self):
         # handle the paths
         state_dict_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'state_dict.pth')
-        config_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'config.yaml')
+        config_path     = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'config.yaml')
         base_shape_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'base_shape.yaml')
 
         # Load the config
@@ -53,10 +55,8 @@ class Minimol:
             global_bs=self.datamodule.batch_size_training,
         )
         predictor.load_state_dict(torch.load(state_dict_path), strict=False)
-        predictor = predictor.float()
-        self.predictor = Fingerprinter(predictor, 'graph_output_nn-graph:0', out_type='numpy')
+        self.predictor = Fingerprinter(predictor, 'gnn:15')
         self.predictor.setup()
-
 
     def load_config(self, config_name):
         hydra.initialize('ckpts/minimol_v1/', version_base=None)
@@ -74,10 +74,12 @@ class Minimol:
         results = []
         for i in tqdm(range(0, len(input_features), batch_size)):
             batch = Batch.from_data_list(input_features[i:(i + batch_size)])
-            batch = {"features": batch}
-            fingerprint_graph = self.predictor.get_fingerprints_for_batch(batch)
+            batch = {"features": batch, "batch_indices": batch.batch}
+            node_features = self.predictor.get_fingerprints_for_batch(batch)
+            fingerprint_graph = global_max_pool(node_features, batch['batch_indices'])
             num_molecules = min(batch_size, fingerprint_graph.shape[0])
             results += [fingerprint_graph[i] for i in range(num_molecules)]
+
         return results
     
     def to_fp32(self, input_features: list) -> list:
