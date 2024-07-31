@@ -35,8 +35,6 @@ cd minimol
 mamba env create -f env.yml -n minimol_venv
 mamba activate minimol
 ```
-For training a downstream model on the fingerprints see `./notebooks/downstream_adaptation.ipnyb`.
-
 *To install mamba see [the official documentation](https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html).*
 
 ## Performance
