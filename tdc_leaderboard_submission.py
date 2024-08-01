@@ -59,7 +59,6 @@ class TaskHead(nn.Module):
 def model_factory(hidden_dim, depth, combine, task, lr, epochs=25, warmup=5, weight_decay=0.0001):
     model = TaskHead(hidden_dim=hidden_dim, depth=depth, combine=combine)
     optimiser = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-
     loss_fn = nn.BCELoss() if task == 'classification' else nn.MSELoss()        
 
     def lr_fn(epoch):
@@ -139,11 +138,12 @@ class AdmetDataset(Dataset):
         target = torch.tensor(self.targets[idx])
         return sample, target
 
-EPOCHS = 25
-RESULTS_FILE_PATH = 'predictions_list_largermodel.pkl'
 
-group = admet_group(path='admet_data/')
-featuriser = Minimol()
+EPOCHS = 25
+REPETITIONS = 5
+ENSEMBLE_SIZE = 5
+RESULTS_FILE_PATH = 'predictions_list_final.pkl'
+TASK_HEAD_HPARAMS = {'hidden_dim': 512, 'depth': 4, 'combine': True, 'lr': 0.0003}
 
 if os.path.exists(RESULTS_FILE_PATH):
     with open(RESULTS_FILE_PATH, 'rb') as f:
@@ -151,33 +151,30 @@ if os.path.exists(RESULTS_FILE_PATH):
 else:
     predictions_list = []
 
-# LOOP 1: datasets
-for dataset_i, dataset_name in enumerate(group.dataset_names):
-    print(f"Dataset {dataset_name}, {dataset_i + 1} / {len(group.dataset_names)}")
-    if [list(d.keys())[0] for d in predictions_list].count(dataset_name) >= 5:
-        print(f"There are already 5 scores for the `{dataset_name}` dataset. Skipping.")
-        continue
+group = admet_group(path='admet_data/')
+featuriser = Minimol()
 
-    benchmark = group.get(dataset_name)
-    name = benchmark['name']
-    mols_test = benchmark['test']
-    with open(os.devnull, 'w') as fnull, redirect_stdout(fnull), redirect_stderr(fnull): # suppress output
-        mols_test['Embedding'] = featuriser(list(mols_test['Drug']))
-    test_loader = DataLoader(AdmetDataset(mols_test), batch_size=128, shuffle=False)
+# LOOP 1: repetitions
+for rep_i, seed1 in enumerate(range(1, REPETITIONS+1)):
+    print(f"Repetition {rep_i + 1} / 5")
+    predictions = {}
 
-    # LOOP 2: repetitions
-    for rep_i, seed1 in enumerate([1, 2, 3, 4, 5]):
-        print(f"\tRepetition {rep_i + 1} / 5")
+    # LOOP 2: datasets
+    for dataset_i, dataset_name in enumerate(group.dataset_names):
+        print(f"\tDataset {dataset_name}, {dataset_i + 1} / {len(group.dataset_names)}")
 
-        predictions = {}
+        benchmark = group.get(dataset_name)
+        name = benchmark['name']
+        mols_test = benchmark['test']
+        with open(os.devnull, 'w') as fnull, redirect_stdout(fnull), redirect_stderr(fnull): # suppress output
+            mols_test['Embedding'] = featuriser(list(mols_test['Drug']))
+        test_loader = DataLoader(AdmetDataset(mols_test), batch_size=128, shuffle=False)
+
         task = 'classification' if len(benchmark['test']['Y'].unique()) == 2 else 'regression'
-        hparams = {'hidden_dim': 1024, 'depth': 4, 'combine': True, 'lr': 0.0001}
-        model, optimiser, lr_scheduler, loss_fn = model_factory(**hparams, task=task)
         
         best_models = []
-
         # LOOP3: ensemble on folds
-        for fold_i, seed2 in enumerate([6, 7, 8, 9, 10]):
+        for fold_i, seed2 in enumerate(range(REPETITIONS+1, REPETITIONS+ENSEMBLE_SIZE+1)):
             print(f"\t\tFold {fold_i + 1} / 5")
             seed = cantor_pairing(seed1, seed2)
 
@@ -188,7 +185,7 @@ for dataset_i, dataset_name in enumerate(group.dataset_names):
             val_loader   = DataLoader(AdmetDataset(mols_valid), batch_size=128, shuffle=False)
             train_loader = DataLoader(AdmetDataset(mols_train), batch_size=32, shuffle=True)
 
-            model, optimiser, lr_scheduler, loss_fn = model_factory(**hparams, task=task)
+            model, optimiser, lr_scheduler, loss_fn = model_factory(**TASK_HEAD_HPARAMS, task=task)
 
             best_epoch = {"model": None, "result": None}
             
@@ -209,9 +206,9 @@ for dataset_i, dataset_name in enumerate(group.dataset_names):
         y_pred_test = evaluate_ensemble(best_models, test_loader, task)
         
         predictions[name] = y_pred_test
-        predictions_list.append(predictions)
 
-    with open(RESULTS_FILE_PATH, 'wb') as f:
-        pickle.dump(predictions_list, f)
+    predictions_list.append(predictions)
+    with open(RESULTS_FILE_PATH, 'wb') as f: pickle.dump(predictions_list, f)
 
 results = group.evaluate_many(predictions_list)
+print(results)
