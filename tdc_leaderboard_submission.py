@@ -265,3 +265,30 @@ for rep_i, seed1 in enumerate(range(1, REPETITIONS+1)):
 
 results = group.evaluate_many(predictions_list)
 print(results)
+
+"""
+>> {
+    'caco2_wang': [0.35, 0.018],
+    'hia_hou': [0.993, 0.005],
+    'pgp_broccatelli': [0.942, 0.002],
+    'bioavailability_ma': [0.689, 0.02],
+    'lipophilicity_astrazeneca': [0.456, 0.008],
+    'solubility_aqsoldb': [0.741, 0.013],
+    'bbb_martins': [0.924, 0.003],
+    'ppbr_az': [7.696, 0.125],
+    'vdss_lombardo': [0.535, 0.027],
+    'cyp2d6_veith': [0.719, 0.004],
+    'cyp3a4_veith': [0.877, 0.001],
+    'cyp2c9_veith': [0.823, 0.006],
+    'cyp2d6_substrate_carbonmangels': [0.695, 0.032],
+    'cyp3a4_substrate_carbonmangels': [0.663, 0.008],
+    'cyp2c9_substrate_carbonmangels': [0.474, 0.025],
+    'half_life_obach': [0.495, 0.042],
+    'clearance_microsome_az': [0.628, 0.005],
+    'clearance_hepatocyte_az': [0.446, 0.029],
+    'herg': [0.846, 0.016],
+    'ames': [0.849, 0.004],
+    'dili': [0.956, 0.006],
+    'ld50_zhu': [0.585, 0.008]
+}
+"""
