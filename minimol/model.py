@@ -4,6 +4,7 @@ import torch
 from omegaconf import OmegaConf
 from typing import Union
 import pkg_resources
+from contextlib import redirect_stdout, redirect_stderr
 
 from torch_geometric.nn import global_max_pool
 
@@ -23,12 +24,12 @@ from torch_geometric.data import Batch
 
 class Minimol: 
     
-    def __init__(self):
+    def __init__(self, batch_size: int = 100):
+        self.batch_size = batch_size
         # handle the paths
         state_dict_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'state_dict.pth')
         config_path     = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'config.yaml')
         base_shape_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'base_shape.yaml')
-
         # Load the config
         cfg = self.load_config(os.path.basename(config_path))
         cfg = OmegaConf.to_container(cfg, resolve=True)
@@ -58,6 +59,7 @@ class Minimol:
         self.predictor = Fingerprinter(predictor, 'gnn:15')
         self.predictor.setup()
 
+
     def load_config(self, config_name):
         hydra.initialize('ckpts/minimol_v1/', version_base=None)
         cfg = hydra.compose(config_name=config_name)
@@ -65,15 +67,16 @@ class Minimol:
 
     def __call__(self, smiles: Union[str,list]) -> torch.Tensor:
         smiles = [smiles] if not isinstance(smiles, list) else smiles
-
-        input_features, _ = self.datamodule._featurize_molecules(smiles)
-        input_features = self.to_fp32(input_features)
         
-        batch_size = min(100, len(input_features))
+        batch_size = min(self.batch_size, len(smiles))
 
         results = []
-        for i in tqdm(range(0, len(input_features), batch_size)):
-            batch = Batch.from_data_list(input_features[i:(i + batch_size)])
+        for i in tqdm(range(0, len(smiles), batch_size)):
+            with open(os.devnull, 'w') as fnull, redirect_stdout(fnull), redirect_stderr(fnull): # suppress output
+                input_features, _ = self.datamodule._featurize_molecules(smiles[i:(i + batch_size)])
+                input_features = self.to_fp32(input_features)
+
+            batch = Batch.from_data_list(input_features)
             batch = {"features": batch, "batch_indices": batch.batch}
             node_features = self.predictor.get_fingerprints_for_batch(batch)
             fingerprint_graph = global_max_pool(node_features, batch['batch_indices'])
