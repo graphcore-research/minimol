@@ -26,7 +26,9 @@ For training a downstream model on the fingerprints see [`./notebooks/downstream
 ## Installation
 
 ### Pip
+When used with cuda, use `nvcc --version` to see which version of the driver is installed on your machine, to select the wheel (cuXXX):
 ```
+pip install torch-sparse torch-cluster torch-scatter -f https://pytorch-geometric.com/whl/torch-2.3.0+cu124.html
 pip install minimol
 ```
 
