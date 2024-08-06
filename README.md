@@ -21,7 +21,7 @@ model(smiles)
 >> A list of 4 tensors of (512,) shape
 ```
 
-For a Colab notebook showing how to use Minimol's fingerprints to achieve SoTA results on a downstream task, click here: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/graphcore-research/minimol/blob/main/notebooks/downstream_adaptation.ipynb)
+For a Colab notebook showing how to use Minimol's fingerprints to achieve SoTA results on a downstream task, click here: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/graphcore-research/minimol/blob/main/notebooks/downstream_adaptation.ipynb)
 
 ## Installation
 
