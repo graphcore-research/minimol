@@ -1,3 +1,11 @@
+import builtins
+
+original_print = print
+
+def print(*args, **kwargs):
+    original_print(*args, flush=True, **kwargs)
+
+
 from minimol import Minimol
 
 import os
@@ -139,34 +147,39 @@ class AdmetDataset(Dataset):
         return sample, target
 
 
+import sys
+ckpt_name = sys.argv[1]
+base  = '/home/blazejb/minimol/minimol/ckpts/'
+
 EPOCHS = 25
-REPETITIONS = 5
+REPETITIONS = 3
 ENSEMBLE_SIZE = 5
-RESULTS_FILE_PATH = 'results_best_val.pkl'
-SWEEP_RESULTS = {
-    'caco2_wang':                       {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0005},
-    'hia_hou':                          {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0003},
-    'pgp_broccatelli':                  {'hidden_dim': 512,  'depth': 4, 'combine': True, 'lr': 0.0003},
-    'bioavailability_ma':               {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0003},
-    'lipophilicity_astrazeneca':        {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0005},
-    'solubility_aqsoldb':               {'hidden_dim': 1024, 'depth': 4, 'combine': True, 'lr': 0.0005},
-    'bbb_martins':                      {'hidden_dim': 2048, 'depth': 3, 'combine': True, 'lr': 0.0001},
-    'ppbr_az':                          {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0003},
-    'vdss_lombardo':                    {'hidden_dim': 1024, 'depth': 4, 'combine': True, 'lr': 0.0001},
-    'cyp2d6_veith':                     {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
-    'cyp3a4_veith':                     {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
-    'cyp2c9_veith':                     {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
-    'cyp2d6_substrate_carbonmangels':   {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
-    'cyp3a4_substrate_carbonmangels':   {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
-    'cyp2c9_substrate_carbonmangels':   {'hidden_dim': 1024, 'depth': 3, 'combine': True, 'lr': 0.0005},
-    'half_life_obach':                  {'hidden_dim': 1024, 'depth': 3, 'combine': True, 'lr': 0.0003},
-    'clearance_microsome_az':           {'hidden_dim': 1024, 'depth': 4, 'combine': True, 'lr': 0.0005},
-    'clearance_hepatocyte_az':          {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0005},
-    'herg':                             {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0003},
-    'ames':                             {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
-    'dili':                             {'hidden_dim': 512,  'depth': 4, 'combine': True, 'lr': 0.0005},
-    'ld50_zhu':                         {'hidden_dim': 1024, 'depth': 4, 'combine': True, 'lr': 0.0001},
-}
+RESULTS_FILE_PATH = f'results_best_{ckpt_name}.pkl'
+DEFAULT_HPARAMS = {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0003}
+# SWEEP_RESULTS = {
+#     'caco2_wang':                       {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0005},
+#     'hia_hou':                          {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0003},
+#     'pgp_broccatelli':                  {'hidden_dim': 512,  'depth': 4, 'combine': True, 'lr': 0.0003},
+#     'bioavailability_ma':               {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0003},
+#     'lipophilicity_astrazeneca':        {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0005},
+#     'solubility_aqsoldb':               {'hidden_dim': 1024, 'depth': 4, 'combine': True, 'lr': 0.0005},
+#     'bbb_martins':                      {'hidden_dim': 2048, 'depth': 3, 'combine': True, 'lr': 0.0001},
+#     'ppbr_az':                          {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0003},
+#     'vdss_lombardo':                    {'hidden_dim': 1024, 'depth': 4, 'combine': True, 'lr': 0.0001},
+#     'cyp2d6_veith':                     {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
+#     'cyp3a4_veith':                     {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
+#     'cyp2c9_veith':                     {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
+#     'cyp2d6_substrate_carbonmangels':   {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
+#     'cyp3a4_substrate_carbonmangels':   {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
+#     'cyp2c9_substrate_carbonmangels':   {'hidden_dim': 1024, 'depth': 3, 'combine': True, 'lr': 0.0005},
+#     'half_life_obach':                  {'hidden_dim': 1024, 'depth': 3, 'combine': True, 'lr': 0.0003},
+#     'clearance_microsome_az':           {'hidden_dim': 1024, 'depth': 4, 'combine': True, 'lr': 0.0005},
+#     'clearance_hepatocyte_az':          {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0005},
+#     'herg':                             {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0003},
+#     'ames':                             {'hidden_dim': 512,  'depth': 3, 'combine': True, 'lr': 0.0001},
+#     'dili':                             {'hidden_dim': 512,  'depth': 4, 'combine': True, 'lr': 0.0005},
+#     'ld50_zhu':                         {'hidden_dim': 1024, 'depth': 4, 'combine': True, 'lr': 0.0001},
+# }
 
 if os.path.exists(RESULTS_FILE_PATH):
     with open(RESULTS_FILE_PATH, 'rb') as f:
@@ -175,7 +188,7 @@ else:
     predictions_list = []
 
 group = admet_group(path='admet_data/')
-featuriser = Minimol()
+featuriser = Minimol(ckpt_folder=os.path.join(base, ckpt_name))
 
 # LOOP 1: repetitions
 for rep_i, seed1 in enumerate(range(1, REPETITIONS+1)):
@@ -208,7 +221,8 @@ for rep_i, seed1 in enumerate(range(1, REPETITIONS+1)):
             val_loader   = DataLoader(AdmetDataset(mols_valid), batch_size=128, shuffle=False)
             train_loader = DataLoader(AdmetDataset(mols_train), batch_size=32, shuffle=True)
 
-            hparams = SWEEP_RESULTS[dataset_name]
+            # hparams = SWEEP_RESULTS[dataset_name]
+            hparams = DEFAULT_HPARAMS
             model, optimiser, lr_scheduler, loss_fn = model_factory(**hparams, task=task)
 
             best_epoch = {"model": None, "result": None}

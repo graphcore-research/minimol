@@ -24,11 +24,15 @@ from torch_geometric.data import Batch
 
 class Minimol: 
     
-    def __init__(self, batch_size: int = 100):
+    def __init__(self, batch_size: int = 100, ckpt_folder: str = None):
         self.batch_size = batch_size
         # handle the paths
-        state_dict_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'state_dict.pth')
-        config_path     = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'config.yaml')
+        if ckpt_folder is not None:
+            state_dict_path = os.path.join(ckpt_folder, 'state_dict.pth')
+            config_path     = os.path.join(ckpt_folder, 'config.yaml')
+        else:
+            state_dict_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'state_dict.pth')
+            config_path     = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'config.yaml')
         base_shape_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'base_shape.yaml')
         # Load the config
         cfg = self.load_config(os.path.basename(config_path))
