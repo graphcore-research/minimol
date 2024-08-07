@@ -116,7 +116,7 @@ def evaluate_ensemble(predictors, dataloader, task):
     return predictions
 
 
-def train_one_epoch(predictor, train_loader, optimiser, lr_scheduler, loss_fn, epoch):
+def train_one_epoch(predictor, train_loader, optimiser, lr_scheduler, loss_fn, task, epoch):
     predictor.train()        
     train_loss = 0
     
@@ -149,7 +149,7 @@ class AdmetDataset(Dataset):
 
 import sys
 ckpt_name = sys.argv[1]
-base  = '/home/blazejb/minimol/minimol/ckpts/'
+base  = '/nethome/blazejb/minimol/minimol/ckpts/'
 
 EPOCHS = 25
 REPETITIONS = 3
@@ -229,7 +229,7 @@ for rep_i, seed1 in enumerate(range(1, REPETITIONS+1)):
             
             # LOOP4: training loop
             for epoch in range(EPOCHS):
-                model = train_one_epoch(model, train_loader, optimiser, lr_scheduler, loss_fn, epoch)
+                model = train_one_epoch(model, train_loader, optimiser, lr_scheduler, loss_fn, task, epoch)
                 val_loss = evaluate(model, val_loader, loss_fn, task=task)
 
                 if best_epoch['model'] is None:
