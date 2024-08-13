@@ -142,7 +142,7 @@ class AdmetDataset(Dataset):
 EPOCHS = 25
 REPETITIONS = 5
 ENSEMBLE_SIZE = 5
-RESULTS_FILE_PATH = 'results.pkl'
+RESULTS_FILE_PATH = 'results_gpu.pkl'
 SWEEP_RESULTS = {
     'caco2_wang':                       {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0005},
     'hia_hou':                          {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0003},
@@ -175,7 +175,7 @@ else:
     predictions_list = []
 
 group = admet_group(path='admet_data/')
-featuriser = Minimol()
+featuriser = Minimol(base_path='/nethome/blazejb/minimol/minimol/ckpts/minimol_v1_gpu')
 
 # LOOP 1: repetitions
 for rep_i, seed1 in enumerate(range(1, REPETITIONS+1)):

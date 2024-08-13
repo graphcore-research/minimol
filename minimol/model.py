@@ -8,6 +8,7 @@ from contextlib import redirect_stdout, redirect_stderr
 
 from torch_geometric.nn import global_max_pool
 
+from graphium.trainer.predictor import PredictorModule
 from graphium.finetuning.fingerprinting import Fingerprinter
 from graphium.config._loader import (
     load_accelerator,
@@ -24,12 +25,17 @@ from torch_geometric.data import Batch
 
 class Minimol: 
     
-    def __init__(self, batch_size: int = 100):
+    def __init__(self, batch_size: int = 100, base_path: str = None):
         self.batch_size = batch_size
         # handle the paths
-        state_dict_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'state_dict.pth')
-        config_path     = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'config.yaml')
-        base_shape_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'base_shape.yaml')
+        if base_path is None:
+            state_dict_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'state_dict.pth')
+            config_path     = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'config.yaml')
+            base_shape_path = pkg_resources.resource_filename('minimol.ckpts.minimol_v1', 'base_shape.yaml')
+        else:
+            ckpt_path       = os.path.join(base_path, 'model.ckpt')
+            config_path     = os.path.join(base_path, 'config.yaml')
+            base_shape_path = os.path.join(base_path, 'base_shape.yaml')
         # Load the config
         cfg = self.load_config(os.path.basename(config_path))
         cfg = OmegaConf.to_container(cfg, resolve=True)
@@ -42,21 +48,26 @@ class Minimol:
         # Load the model
         model_class, model_kwargs = load_architecture(cfg, in_dims=self.datamodule.in_dims)
         metrics = load_metrics(self.cfg)
-        predictor = load_predictor(
-            config=self.cfg,
-            model_class=model_class,
-            model_kwargs=model_kwargs,
-            metrics=metrics,
-            task_levels=self.datamodule.get_task_levels(),
-            accelerator_type=accelerator_type,
-            featurization=self.datamodule.featurization,
-            task_norms=self.datamodule.task_norms,
-            replicas=1,
-            gradient_acc=1,
-            global_bs=self.datamodule.batch_size_training,
-        )
-        predictor.load_state_dict(torch.load(state_dict_path), strict=False)
-        self.predictor = Fingerprinter(predictor, 'gnn:15')
+
+        if base_path is None:
+            predictor = load_predictor(
+                config=self.cfg,
+                model_class=model_class,
+                model_kwargs=model_kwargs,
+                metrics=metrics,
+                task_levels=self.datamodule.get_task_levels(),
+                accelerator_type=accelerator_type,
+                featurization=self.datamodule.featurization,
+                task_norms=self.datamodule.task_norms,
+                replicas=1,
+                gradient_acc=1,
+                global_bs=self.datamodule.batch_size_training,
+            )
+            predictor.load_state_dict(torch.load(state_dict_path), strict=False)
+        else:
+            predictor = PredictorModule.load_pretrained_model(name_or_path=ckpt_path, device=accelerator_type)
+
+        self.predictor = Fingerprinter(predictor, 'graph_output_nn-graph:0')
         self.predictor.setup()
 
 
@@ -78,8 +89,9 @@ class Minimol:
 
             batch = Batch.from_data_list(input_features)
             batch = {"features": batch, "batch_indices": batch.batch}
-            node_features = self.predictor.get_fingerprints_for_batch(batch)
-            fingerprint_graph = global_max_pool(node_features, batch['batch_indices'])
+            fingerprint_graph = self.predictor.get_fingerprints_for_batch(batch)
+            # node_features = self.predictor.get_fingerprints_for_batch(batch)
+            # fingerprint_graph = global_max_pool(node_features, batch['batch_indices'])
             num_molecules = min(batch_size, fingerprint_graph.shape[0])
             results += [fingerprint_graph[i] for i in range(num_molecules)]
 
