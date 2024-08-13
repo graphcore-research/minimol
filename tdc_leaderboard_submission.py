@@ -142,7 +142,7 @@ class AdmetDataset(Dataset):
 EPOCHS = 25
 REPETITIONS = 5
 ENSEMBLE_SIZE = 5
-RESULTS_FILE_PATH = 'results_best_val.pkl'
+RESULTS_FILE_PATH = 'results.pkl'
 SWEEP_RESULTS = {
     'caco2_wang':                       {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0005},
     'hia_hou':                          {'hidden_dim': 2048, 'depth': 4, 'combine': True, 'lr': 0.0003},
@@ -179,13 +179,10 @@ featuriser = Minimol()
 
 # LOOP 1: repetitions
 for rep_i, seed1 in enumerate(range(1, REPETITIONS+1)):
-    print(f"Repetition {rep_i + 1} / 5")
     predictions = {}
 
     # LOOP 2: datasets
     for dataset_i, dataset_name in enumerate(group.dataset_names):
-        print(f"\tDataset {dataset_name}, {dataset_i + 1} / {len(group.dataset_names)}")
-
         benchmark = group.get(dataset_name)
         name = benchmark['name']
         mols_test = benchmark['test']
@@ -198,7 +195,6 @@ for rep_i, seed1 in enumerate(range(1, REPETITIONS+1)):
         best_models = []
         # LOOP3: ensemble on folds
         for fold_i, seed2 in enumerate(range(REPETITIONS+1, REPETITIONS+ENSEMBLE_SIZE+1)):
-            print(f"\t\tFold {fold_i + 1} / 5")
             seed = cantor_pairing(seed1, seed2)
 
             with open(os.devnull, 'w') as fnull, redirect_stdout(fnull), redirect_stderr(fnull): # suppress output
@@ -215,6 +211,12 @@ for rep_i, seed1 in enumerate(range(1, REPETITIONS+1)):
             
             # LOOP4: training loop
             for epoch in range(EPOCHS):
+                print(
+                    f"Rep {rep_i + 1} / {REPETITIONS} | "
+                    f"Dataset {dataset_name}, {dataset_i + 1} / {len(group.dataset_names)} | "
+                    f"Fold {fold_i + 1} / {ENSEMBLE_SIZE} | "
+                    f"Epoch {epoch + 1} / {EPOCHS}"
+                )
                 model = train_one_epoch(model, train_loader, optimiser, lr_scheduler, loss_fn, epoch)
                 val_loss = evaluate(model, val_loader, loss_fn, task=task)
 
