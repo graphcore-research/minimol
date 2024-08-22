@@ -21,6 +21,9 @@ from tqdm import tqdm
 
 from torch_geometric.data import Batch
 
+import random
+import numpy as np
+
 
 class Minimol: 
     
@@ -55,10 +58,22 @@ class Minimol:
             gradient_acc=1,
             global_bs=self.datamodule.batch_size_training,
         )
+        self.set_training_mode_false(predictor)
         predictor.load_state_dict(torch.load(state_dict_path), strict=False)
         self.predictor = Fingerprinter(predictor, 'gnn:15')
         self.predictor.setup()
 
+    def set_training_mode_false(self, module):
+        if isinstance(module, torch.nn.Module):
+            module.training = False
+            for submodule in module.children():
+                self.set_training_mode_false(submodule)
+        elif isinstance(module, list):
+            for value in module:
+                self.set_training_mode_false(value)
+        elif isinstance(module, dict):
+            for _, value in module.items():
+                self.set_training_mode_false(value)
 
     def load_config(self, config_name):
         hydra.initialize('ckpts/minimol_v1/', version_base=None)
