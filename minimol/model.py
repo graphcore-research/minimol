@@ -21,9 +21,6 @@ from tqdm import tqdm
 
 from torch_geometric.data import Batch
 
-import random
-import numpy as np
-
 
 class Minimol: 
     
