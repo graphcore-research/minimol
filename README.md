@@ -28,6 +28,7 @@ For a Colab notebook showing how to use Minimol's fingerprints to achieve SoTA r
 ### Pip
 When used with cuda, use `nvcc --version` to see which version of the driver is installed on your machine, to select the wheel (cuXXX):
 ```
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
 pip install torch-sparse torch-cluster torch-scatter -f https://pytorch-geometric.com/whl/torch-2.3.0+cu124.html
 pip install minimol
 ```

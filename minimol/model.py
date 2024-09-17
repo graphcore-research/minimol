@@ -14,7 +14,7 @@ from graphium.config._loader import (
     load_predictor,
     load_metrics,
     load_architecture,
-    load_datamodule,
+    load_datamodule
 )
 
 from tqdm import tqdm
@@ -42,6 +42,7 @@ class Minimol:
         # Load the model
         model_class, model_kwargs = load_architecture(cfg, in_dims=self.datamodule.in_dims)
         metrics = load_metrics(self.cfg)
+
         predictor = load_predictor(
             config=self.cfg,
             model_class=model_class,
@@ -55,6 +56,7 @@ class Minimol:
             gradient_acc=1,
             global_bs=self.datamodule.batch_size_training,
         )
+
         self.set_training_mode_false(predictor)
         predictor.load_state_dict(torch.load(state_dict_path), strict=False)
         self.predictor = Fingerprinter(predictor, 'gnn:15')
@@ -85,14 +87,14 @@ class Minimol:
         results = []
         for i in tqdm(range(0, len(smiles), batch_size)):
             with open(os.devnull, 'w') as fnull, redirect_stdout(fnull), redirect_stderr(fnull): # suppress output
-                input_features, _ = self.datamodule._featurize_molecules(smiles[i:(i + batch_size)])
+                input_features, idx_none = self.datamodule._featurize_molecules(smiles[i:(i + batch_size)])
+                input_features = [x for idx, x in enumerate(input_features) if idx not in idx_none]
                 input_features = self.to_fp32(input_features)
-
-            batch = Batch.from_data_list(input_features)
-            batch = {"features": batch, "batch_indices": batch.batch}
-            node_features = self.predictor.get_fingerprints_for_batch(batch)
+                batch = Batch.from_data_list(input_features)
+                batch = {"features": batch, "batch_indices": batch.batch}
+                node_features = self.predictor.get_fingerprints_for_batch(batch)
             fingerprint_graph = global_max_pool(node_features, batch['batch_indices'])
-            num_molecules = min(batch_size, fingerprint_graph.shape[0])
+            num_molecules = fingerprint_graph.shape[0]
             results += [fingerprint_graph[i] for i in range(num_molecules)]
 
         return results
