@@ -51,7 +51,7 @@ class LogisticRegressionModel(nn.Module):
         return self.linear(x)
     
     def _exact_reg_term(self, logits):
-        numerator = torch.sum(torch.exp(self._get_loss_weight() * logits), axis=1)
+        numerator   = torch.sum(torch.exp(self._get_loss_weight() * logits), axis=1)
         denominator = torch.sum(torch.exp(logits), axis=1)**(self._get_loss_weight()) 
         return torch.mean(torch.log(numerator / denominator))
 
@@ -65,9 +65,8 @@ class LogisticRegressionModel(nn.Module):
         criterion_loss = self.criterion(y, y_true) 
 
         if self.log_variance:
-            if self.exact:
-                return self._get_loss_weight() * criterion_loss + self._exact_reg_term(y), criterion_loss
-            else: # approximated
-                return self._get_loss_weight() * criterion_loss + self._get_log_sigma(), criterion_loss
+            uw_loss = self._get_loss_weight() * criterion_loss
+            uw += self._exact_reg_term(y) if self.exact else self._get_log_sigma()
+            return uw_loss, criterion_loss
         
         return criterion_loss

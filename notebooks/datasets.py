@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 
 
 def generate_1d_regression_data(n_samples    : int   = 1000,
-                                   domain_range : int   = 2.0,
-                                   variance     : float = 0.1,
-                                   seed         : int   = 42,
-                                   as_tensors   : bool  = False):
+                                domain_range : int   = 2.0,
+                                variance     : float = 0.1,
+                                seed         : int   = 42,
+                                as_tensors   : bool  = False):
     np.random.seed(seed)
     
     a = np.random.uniform(-10, 10)
@@ -27,15 +27,13 @@ def generate_1d_regression_data(n_samples    : int   = 1000,
     return x, y
 
 
-def generate_classification_data(
-        n_samples   : int,
-        variance    : float, 
-        n_features  : int = 2, 
-        mean_range  : tuple = (-3, 3), 
-        seed        : int = 42, 
-        as_tensors  : bool = False,
-        one_hot     : bool = False
-    ):
+def generate_classification_data(n_samples   : int,
+                                 variance    : float, 
+                                 n_features  : int = 2, 
+                                 mean_range  : tuple = (-3, 3), 
+                                 seed        : int = 42, 
+                                 as_tensors  : bool = False,
+                                 one_hot     : bool = False):
     """
     The variance is defined as `(var0 + var1) / (||mu1 - mu0||^2)`
     """
@@ -66,15 +64,13 @@ def generate_classification_data(
     return x, y
 
 
-def generate_boltzmann_classification_data(
-        n_samples   : int,
-        variance    : float,
-        n_features  : int   = 2,
-        mean_range  : tuple = (-3, 3),
-        seed        : int   = 42,
-        one_hot     : bool  = False,
-        as_tensors  : bool  = False
-    ):
+def generate_boltzmann_classification_data(n_samples   : int,
+                                           variance    : float,
+                                           n_features  : int   = 2,
+                                           mean_range  : tuple = (-3, 3),
+                                           seed        : int   = 42,
+                                           one_hot     : bool  = False,
+                                           as_tensors  : bool  = False):
 
     np.random.seed(seed)
     
